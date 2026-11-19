@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Instagram Mini</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fafafa;color:#222;font-family:Arial,sans-serif}
+header{background:white;padding:17px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
+.logo{font-size:25px;font-weight:bold;color:#d62976}
+main{max-width:500px;margin:auto;padding-bottom:80px}
+.post{background:white;margin:15px 0;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+.user{padding:13px;font-weight:bold}
+.post img{width:100%;display:block;max-height:500px;object-fit:cover}
+.actions{padding:12px;font-size:25px}
+.actions button{border:0;background:none;font-size:25px;cursor:pointer}
+.caption{padding:0 13px 13px}
+input{padding:12px;border:1px solid #ddd;border-radius:7px}
+.upload{padding:15px;background:white;margin:15px 0}
+.upload input{width:100%;margin:7px 0}
+.upload button{background:#d62976;color:white;border:0;padding:12px;border-radius:7px}
+nav{position:fixed;bottom:0;left:0;width:100%;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding:15px}
+nav button{border:0;background:none;font-size:24px;cursor:pointer}
+#profile{display:none;padding:25px;text-align:center}
+#profile img{width:90px;height:90px;border-radius:50%;object-fit:cover}
+#feed{display:block}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">My Instagram Mini 📸</div>
+<div>❤️ ✉️</div>
+</header>
+
+<main>
+<section id="feed">
+<div class="upload">
+<h3>Share a photo 📸</h3>
+<input id="username" placeholder="Your name">
+<input id="caption" placeholder="Write a caption...">
+<input id="photo" type="file" accept="image/*">
+<button onclick="uploadPost()">Share Photo</button>
+</div>
+
+<div id="posts"></div>
+</section>
+
+<section id="profile">
+<img src="https://placehold.co/100x100?text=Me" alt="Profile">
+<h2 id="profileName">My Profile</h2>
+<p>Welcome to my Instagram Mini!</p>
+<p>Share photos and connect with friends.</p>
+</section>
+</main>
+
+<nav>
+<button onclick="showFeed()">🏠</button>
+<button onclick="document.getElementById('photo').click()">➕</button>
+<button onclick="showProfile()">👤</button>
+</nav>
+
+<script>
+function uploadPost(){
+const name=document.getElementById('username').value.trim()||'Guest';
+const caption=document.getElementById('caption').value;
+const file=document.getElementById('photo').files[0];
+
+if(!file){alert('Please select a photo first!');return;}
+
+const reader=new FileReader();
+reader.onload=function(e){
+const post=document.createElement('div');
+post.className='post';
+post.innerHTML=`
+<div class="user"></div>
+<img alt="Shared photo">
+<div class="actions">
+<button class="like">♡</button>
+<span class="likes">0 likes</span>
+</div>
+<div class="caption"></div>
+<div style="padding:12px">
+<input placeholder="Write a comment..." style="width:75%">
+<button class="commentBtn">Post</button>
+<div class="comments"></div>
+</div>`;
+post.querySelector('.user').textContent='👤 '+name;
+post.querySelector('img').src=e.target.result;
+post.querySelector('.caption').textContent=name+': '+caption;
+let count=0;
+post.querySelector('.like').onclick=function(){
+count=count===0?1:0;
+this.textContent=count?'❤️':'♡';
+post.querySelector('.likes').textContent=count+' likes';
+};
+post.querySelector('.commentBtn').onclick=function(){
+const input=post.querySelector('input');
+if(input.value.trim()){
+const comment=document.createElement('p');
+comment.textContent='💬 '+input.value;
+post.querySelector('.comments').appendChild(comment);
+input.value='';
+}
+};
+document.getElementById('posts').prepend(post);
+document.getElementById('caption').value='';
+document.getElementById('photo').value='';
+};
+reader.readAsDataURL(file);
+}
+
+function showProfile(){
+document.getElementById('feed').style.display='none';
+document.getElementById('profile').style.display='block';
+document.getElementById('profileName').textContent=
+document.getElementById('username').value||'My Profile';
+}
+function showFeed(){
+document.getElementById('feed').style.display='block';
+document.getElementById('profile').style.display='none';
+}
+</script>
+</body>
+  </html>
+  
