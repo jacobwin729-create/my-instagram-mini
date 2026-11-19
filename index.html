@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Instagram Mini</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7fb;color:#222;font-family:Arial,sans-serif}
+header{background:white;padding:17px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;position:sticky;top:0;z-index:5}
+.logo{font-size:23px;font-weight:bold;color:#d62976}
+header span{font-size:22px}
+main{max-width:520px;margin:auto;padding-bottom:75px}
+.stories{display:flex;gap:15px;overflow-x:auto;background:white;padding:16px}
+.story{text-align:center;min-width:62px;font-size:12px}
+.circle{width:57px;height:57px;border-radius:50%;padding:3px;background:linear-gradient(45deg,#ffb000,#e1306c,#833ab4);margin:auto auto 5px}
+.circle img{width:100%;height:100%;object-fit:cover;border:3px solid white;border-radius:50%}
+.post{background:white;margin:12px 0;border:1px solid #eee}
+.user{display:flex;align-items:center;padding:12px;gap:10px;font-weight:bold}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(45deg,#ff8a00,#e1306c);display:grid;place-items:center;color:white}
+.photo{width:100%;height:330px;object-fit:cover;background:linear-gradient(135deg,#ffb6c1,#8b5cf6,#ffb000)}
+.actions{padding:12px;display:flex;gap:18px;font-size:25px}
+.actions button{border:0;background:none;font-size:25px;cursor:pointer}
+.details{padding:0 13px 13px}
+.caption{margin:8px 0}
+.comment{display:flex;gap:7px;padding:10px 12px;border-top:1px solid #eee}
+.comment input{flex:1;border:0;outline:none;font-size:14px}
+.comment button,.upload{border:0;background:#d62976;color:white;padding:9px 14px;border-radius:8px}
+nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;display:flex;justify-content:space-around;padding:14px;font-size:24px}
+nav button{border:0;background:none;font-size:23px}
+.upload-area{padding:18px;background:white;margin:12px;border-radius:12px}
+h3{margin-top:0}
+</style>
+</head>
+<body>
+<header>
+  <span>📸</span>
+  <div class="logo">My Instagram Mini</div>
+  <span>♡</span>
+</header>
+
+<main>
+<section class="stories">
+  <div class="story"><div class="circle">😊</div>Your story</div>
+  <div class="story"><div class="circle">👩🏽</div>Sarah</div>
+  <div class="story"><div class="circle">👨🏻</div>David</div>
+  <div class="story"><div class="circle">👩🏼</div>Emma</div>
+  <div class="story"><div class="circle">👨🏽</div>James</div>
+</section>
+
+<section class="upload-area">
+<h3>Share your moment 📸</h3>
+<input type="file" id="photoInput" accept="image/*">
+<input id="captionInput" placeholder="Write a caption..." style="width:100%;padding:12px;margin:10px 0;border:1px solid #ddd;border-radius:8px">
+<button class="upload" onclick="addPost()">Share photo</button>
+</section>
+
+<div id="feed">
+<article class="post">
+<div class="user"><div class="avatar">S</div> Sarah <span style="margin-left:auto">•••</span></div>
+<div class="photo" style="display:grid;place-items:center;font-size:65px">🌅</div>
+<div class="actions">
+<button onclick="like(this)">♡</button>
+<button onclick="focusComment(this)">💬</button>
+<button onclick="alert('Messaging feature coming soon!')">➤</button>
+</div>
+<div class="details">
+<b class="likes">0 likes</b>
+<p class="caption"><b>Sarah</b> Enjoying beautiful moments! ❤️</p>
+</div>
+<div class="comment"><input placeholder="Add a comment..."><button onclick="sendComment(this)">Post</button></div>
+</article>
+</div>
+</main>
+
+<nav>
+<button onclick="window.scrollTo(0,0)">⌂</button>
+<button onclick="document.getElementById('photoInput').click()">＋</button>
+<button onclick="alert('Messages coming soon!')">✉</button>
+<button onclick="alert('Your profile is coming soon!')">👤</button>
+</nav>
+
+<script>
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+
+function like(button){
+ const liked=button.textContent==='♥';
+ button.textContent=liked?'♡':'♥';
+ button.style.color=liked?'#222':'#e1306c';
+ const count=button.closest('.post').querySelector('.likes');
+ let n=parseInt(count.textContent)||0;
+ count.textContent=(liked?Math.max(0,n-1):n+1)+' likes';
+}
+function focusComment(button){
+ button.closest('.post').querySelector('.comment input').focus();
+}
+function sendComment(button){
+ const input=button.previousElementSibling;
+ if(!input.value.trim())return;
+ const p=document.createElement('p');
+ p.textContent='You: '+input.value;
+ button.closest('.post').querySelector('.details').appendChild(p);
+ input.value='';
+}
+function addPost(){
+ const file=document.getElementById('photoInput').files[0];
+ const caption=document.getElementById('captionInput').value;
+ if(!file){alert('Please choose a photo first.');return;}
+ const url=URL.createObjectURL(file);
+ const post=document.createElement('article');
+ post.className='post';
+ post.innerHTML=`
+ <div class="user"><div class="avatar">Y</div>You</div>
+ <img class="photo" style="object-fit:cover" src="${url}">
+ <div class="actions"><button onclick="like(this)">♡</button><button onclick="focusComment(this)">💬</button></div>
+ <div class="details"><b class="likes">0 likes</b><p class="caption"></p></div>
+ <div class="comment"><input placeholder="Add a comment..."><button onclick="sendComment(this)">Post</button></div>`;
+ post.querySelector('.caption').textContent=caption;
+ document.getElementById('feed').prepend(post);
+ document.getElementById('photoInput').value='';
+ document.getElementById('captionInput').value='';
+ window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
